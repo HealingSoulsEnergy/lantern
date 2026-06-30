@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#13352f" />
+<title>Lantern — Find Help Near You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#13352f; --mist:#eef3f0; --card:#ffffff;
+    --teal:#157a6e; --teal-dk:#0f5d54;
+    --clay:#b4532a; --clay-soft:#fbeee7;
+    --line:#dbe5e0; --soft:#52635d;
+    --good:#1f7a4d; --good-bg:#e6f3eb;
+    --shadow:0 1px 2px rgba(19,53,47,.06), 0 8px 24px rgba(19,53,47,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--mist); line-height:1.5; -webkit-text-size-adjust:100%; padding-bottom:48px}
+  .wrap{max-width:760px; margin:0 auto; padding:0 16px}
+
+  header{background:var(--ink); color:#eaf4f0; padding:24px 0 22px; border-bottom:4px solid var(--clay)}
+  .brand{display:flex; align-items:center; gap:11px}
+  .brand .mark{flex:none}
+  .brand h1{font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:29px; letter-spacing:-.01em; margin:0; color:#fff}
+  .brand .leaf{font-size:21px; line-height:1}
+  header p{margin:7px 0 0; color:#bcd4cc; font-size:14.5px; max-width:54ch}
+  .danger-line{margin-top:13px; display:inline-flex; align-items:center; gap:8px; background:rgba(180,83,42,.18); border:1px solid rgba(255,255,255,.18); color:#ffe6da; font-size:13.5px; font-weight:600; padding:7px 12px; border-radius:999px}
+  .danger-line a{color:#fff; text-decoration:underline}
+
+  .crisis-bar-wrap{position:sticky; top:0; z-index:60; background:var(--mist)}
+  .crisis-bar-wrap .wrap{position:relative; padding-top:10px; padding-bottom:10px}
+  .crisis-bar{width:100%; cursor:pointer; font:inherit; text-align:left; display:flex; align-items:center; justify-content:space-between; gap:10px; background:#fff; border:1px solid #ecd8cd; border-left:4px solid var(--clay); border-radius:12px; padding:13px 15px; box-shadow:var(--shadow); color:var(--ink)}
+  .crisis-bar:hover{border-color:var(--clay)}
+  .crisis-bar:focus-visible{outline:3px solid rgba(21,122,110,.4); outline-offset:2px}
+  .cb-left{display:flex; align-items:center; gap:10px; font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:16px}
+  .cb-left .dot{width:9px;height:9px;border-radius:50%;background:var(--clay);box-shadow:0 0 0 4px var(--clay-soft); flex:none}
+  .cb-right{display:flex; align-items:center; gap:8px; color:var(--soft); font-size:12.5px; font-weight:600; white-space:nowrap}
+  .chev{transition:transform .2s; font-size:11px; display:inline-block}
+  .crisis-bar[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .crisis-drop{position:absolute; left:16px; right:16px; top:calc(100% - 4px); background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:0 14px 34px rgba(19,53,47,.18); padding:14px; z-index:61; max-height:74vh; overflow:auto}
+  .crisis-drop[hidden]{display:none}
+  .drop-title{font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:15px; margin:2px 2px 12px; color:var(--ink)}
+  .hotlines{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  @media(max-width:560px){ .hotlines{grid-template-columns:1fr} }
+  .hot{display:block; text-decoration:none; color:var(--ink); border:1px solid var(--line); border-radius:12px; padding:11px 13px; background:#fff; transition:border-color .15s, transform .05s}
+  .hot:hover{border-color:var(--clay)}
+  .hot:active{transform:translateY(1px)}
+  .hot .name{font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:space-between; gap:8px}
+  .hot .num{color:var(--clay); font-weight:700; font-size:15px; margin-top:2px}
+  .hot .desc{color:var(--soft); font-size:12.5px; margin-top:2px}
+  .hot .badge{font-size:11px; font-weight:700; color:#8a5a44; background:var(--clay-soft); padding:2px 7px; border-radius:999px; white-space:nowrap}
+  .reassure{margin:14px 2px 2px; color:var(--soft); font-size:12.5px}
+
+  .wrap-main{padding-top:8px}
+  h2.sec{font-family:"Fraunces",Georgia,serif; font-weight:600; font-size:19px; margin:0 0 4px; color:var(--ink)}
+  .sec-note{color:var(--soft); font-size:13.5px; margin:0 0 12px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow)}
+  .pad{padding:18px}
+  .block{margin-bottom:20px}
+
+  .loc-row{display:flex; gap:10px; flex-wrap:wrap}
+  .input{flex:1 1 200px; min-width:0; font:inherit; font-size:16px; padding:13px 14px; border:1px solid var(--line); border-radius:12px; background:#fff; color:var(--ink)}
+  .input:focus{outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(21,122,110,.14)}
+  .btn{font:inherit; font-weight:600; font-size:15px; cursor:pointer; border-radius:12px; padding:13px 16px; border:1px solid transparent; display:inline-flex; align-items:center; gap:8px; justify-content:center}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--teal); color:#fff}
+  .btn-primary:hover{background:var(--teal-dk)}
+  .btn-ghost{background:#fff; color:var(--teal); border-color:var(--teal)}
+  .btn-ghost:hover{background:#f1faf8}
+  .loc-status{margin-top:11px; font-size:13.5px; color:var(--soft); display:flex; align-items:center; gap:7px}
+  .loc-status.set{color:var(--good)}
+  .loc-status .pin{font-size:14px}
+
+  .chips{display:flex; flex-wrap:wrap; gap:9px}
+  .chip{font:inherit; font-weight:600; font-size:14px; cursor:pointer; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:10px 15px; display:inline-flex; align-items:center; gap:8px; transition:border-color .15s, background .15s, color .15s}
+  .chip .ic{font-size:15px}
+  .chip:hover:not(:disabled){border-color:var(--teal)}
+  .chip[aria-pressed="true"]{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .chip:disabled{opacity:.5; cursor:not-allowed}
+
+  #results{margin-top:6px}
+  .state{padding:26px 18px; text-align:center; color:var(--soft); font-size:14.5px}
+  .state strong{color:var(--ink); display:block; font-size:15.5px; margin-bottom:4px; font-family:"Fraunces",Georgia,serif; font-weight:600}
+  .spinner{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){ .spinner{animation:none} .btn:active,.hot:active{transform:none} .chev{transition:none} }
+
+  .dir-note{background:#f4f8f6; border:1px solid var(--line); border-radius:12px; padding:11px 13px; font-size:13px; color:var(--soft); margin-bottom:12px}
+  .dir-note a{color:var(--teal); font-weight:600; text-decoration:none}
+  .dir-note a:hover{text-decoration:underline}
+
+  .place{border-bottom:1px solid var(--line); padding:15px 2px}
+  .place:last-child{border-bottom:none}
+  .place .top{display:flex; justify-content:space-between; gap:12px; align-items:flex-start}
+  .place .nm{font-weight:600; font-size:16px; color:var(--ink); margin:0}
+  .place .dist{font-size:12.5px; font-weight:700; color:var(--teal); white-space:nowrap; background:#eef7f5; padding:3px 9px; border-radius:999px}
+  .meta{margin-top:6px; font-size:13.5px; color:var(--soft); display:flex; flex-wrap:wrap; gap:6px 12px; align-items:center}
+  .open{font-weight:700; font-size:12px; padding:2px 8px; border-radius:999px}
+  .open.yes{color:var(--good); background:var(--good-bg)}
+  .open.no{color:#9a3b3b; background:#f7e9e9}
+  .addr{margin-top:6px; font-size:13.5px; color:var(--soft)}
+  .actions{margin-top:11px; display:flex; flex-wrap:wrap; gap:9px}
+  .actions a{text-decoration:none; font-weight:600; font-size:13.5px; padding:9px 13px; border-radius:10px; display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line)}
+  .a-dir{background:var(--teal); color:#fff !important; border-color:var(--teal)}
+  .a-dir:hover{background:var(--teal-dk)}
+  .a-call{background:#fff; color:var(--teal) !important; border-color:var(--teal)}
+  .a-call:hover{background:#f1faf8}
+  .a-web{background:#fff; color:var(--soft) !important}
+  .a-web:hover{border-color:var(--soft)}
+  .hours{margin-top:9px}
+  .hours summary{font-size:13px; color:var(--teal); cursor:pointer; font-weight:600; list-style:none}
+  .hours summary::-webkit-details-marker{display:none}
+  .hours ul{margin:8px 0 0; padding:0 0 0 2px; list-style:none; color:var(--soft); font-size:13px}
+  .hours li{padding:2px 0}
+
+  .qr-box{margin-top:14px; text-align:center}
+  .qr-box img{border:1px solid var(--line); border-radius:12px; padding:8px; background:#fff; width:200px; height:200px}
+  .qr-box[hidden]{display:none}
+
+  .keynote{border-radius:12px; padding:12px 14px; font-size:13px; margin-bottom:18px; background:#fff7ef; border:1px solid #f0dcc9; color:#7a4a2c}
+  .keynote code{background:#fff; padding:1px 6px; border-radius:6px; border:1px solid #eadbcc; font-size:12px}
+  .keynote.warn{background:#fdecea; border-color:#f3c2bc; color:#8a2b22}
+
+  footer{margin-top:26px; text-align:center; color:var(--soft); font-size:12.5px; line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand"><svg class="mark" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true"><path d="M9.5 3.2h5" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><path d="M12 3.2v2.4" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><rect x="7.2" y="5.6" width="9.6" height="2.8" rx="1.1" stroke="#f4c79a" stroke-width="1.6"/><rect x="8.2" y="8.4" width="7.6" height="9.4" rx="2.6" stroke="#f4c79a" stroke-width="1.6"/><path d="M8.6 20.4h6.8" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="13.4" r="2.1" fill="#f4c79a" opacity=".9"/></svg><h1>Lantern</h1></div>
+    <p>Real help, close to you. Find food, shelter, recovery meetings, animal care, and welcoming spaces nearby.</p>
+    <span class="danger-line">If you are in immediate danger, call <a href="tel:911">911</a>.</span>
+  </div>
+</header>
+
+<div class="crisis-bar-wrap">
+  <div class="wrap">
+    <button class="crisis-bar" id="crisisToggle" aria-expanded="false" aria-controls="crisisBody">
+      <span class="cb-left"><span class="dot"></span> Crisis &amp; help lines</span>
+      <span class="cb-right"><span class="cb-hint">Tap to open</span> <span class="chev">▾</span></span>
+    </button>
+    <div class="crisis-drop" id="crisisBody" hidden>
+      <p class="drop-title">Free, confidential, here whenever you need them</p>
+      <div class="hotlines">
+        <a class="hot" href="tel:988"><span class="name">988 Suicide &amp; Crisis Lifeline <span class="badge">24/7</span></span><span class="num">Call or text 988</span><span class="desc">Anyone in emotional distress or thinking of suicide.</span></a>
+        <a class="hot" href="sms:741741?&body=HOME"><span class="name">Crisis Text Line</span><span class="num">Text HOME to 741741</span><span class="desc">Free, confidential text support for any crisis.</span></a>
+        <a class="hot" href="tel:211"><span class="name">211 Community Help</span><span class="num">Call or text 211</span><span class="desc">Local food, housing, rent, and utility help.</span></a>
+        <a class="hot" href="tel:18006624357"><span class="name">SAMHSA Helpline <span class="badge">24/7</span></span><span class="num">1-800-662-4357</span><span class="desc">Substance use support and treatment referrals.</span></a>
+        <a class="hot" href="tel:18007997233"><span class="name">Domestic Violence Hotline</span><span class="num">1-800-799-7233</span><span class="desc">Or text START to 88788. Confidential support.</span></a>
+        <a class="hot" href="tel:18006564673"><span class="name">Sexual Assault Hotline (RAINN)</span><span class="num">1-800-656-4673</span><span class="desc">Free, confidential, 24/7 survivor support.</span></a>
+        <a class="hot" href="tel:18664887386"><span class="name">The Trevor Project</span><span class="num">1-866-488-7386</span><span class="desc">LGBTQ+ youth. Or text START to 678-678.</span></a>
+        <a class="hot" href="tel:18888434564"><span class="name">LGBT National Hotline</span><span class="num">1-888-843-4564</span><span class="desc">Support for all ages. Trans Lifeline: 877-565-8860.</span></a>
+        <a class="hot" href="tel:988"><span class="name">Veterans Crisis Line</span><span class="num">Call 988, press 1</span><span class="desc">Or text 838255. For veterans and families.</span></a>
+        <a class="hot" href="tel:18007862929"><span class="name">National Runaway Safeline</span><span class="num">1-800-786-2929</span><span class="desc">For youth and families, 24/7.</span></a>
+      </div>
+      <p class="reassure">These are free and confidential, and most answer day or night. They stay pinned at the top so they are always one tap away.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap wrap-main">
+
+  <div id="hostNote" class="keynote warn" style="display:none">
+    You are viewing this as a file on your device, so the map search and location cannot run. Put it online and open the https:// link. The crisis lines above still work here.
+  </div>
+  <div id="keyNote" class="keynote" style="display:none">
+    To turn on the nearby search, paste your Google API key into the <code>API_KEY</code> line near the top of this file.
+  </div>
+
+  <section class="block card">
+    <div class="pad">
+      <h2 class="sec">Where are you looking?</h2>
+      <p class="sec-note">Use your location or type a ZIP code or address. We search within 20 miles.</p>
+      <div class="loc-row">
+        <button class="btn btn-ghost" id="useLoc" type="button">📍 Use my location</button>
+        <input class="input" id="zip" type="text" inputmode="text" placeholder="ZIP code or address" autocomplete="postal-code" />
+        <button class="btn btn-primary" id="setZip" type="button">Set location</button>
+      </div>
+      <div class="loc-status" id="locStatus"><span class="pin">·</span> No location set yet.</div>
+    </div>
+  </section>
+
+  <section class="block card">
+    <div class="pad">
+      <h2 class="sec">What do you need?</h2>
+      <p class="sec-note">Pick one to see places near you, sorted by distance.</p>
+      <div class="chips" id="chips"></div>
+    </div>
+  </section>
+
+  <section class="block card">
+    <div class="pad">
+      <div id="results">
+        <div class="state"><strong>Choose a category to begin.</strong>Set your location above, then tap what you are looking for.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block card">
+    <div class="pad">
+      <h2 class="sec">Share Lantern</h2>
+      <p class="sec-note">Send it to someone who needs it, or print the code for a flyer or front desk.</p>
+      <div class="loc-row">
+        <button class="btn btn-primary" id="shareBtn" type="button">🔗 Share link</button>
+        <button class="btn btn-ghost" id="smsBtn" type="button">💬 Text a link</button>
+        <button class="btn btn-ghost" id="qrBtn" type="button" aria-expanded="false">📱 Show QR code</button>
+      </div>
+      <div class="loc-status" id="shareMsg"></div>
+      <div class="qr-box" id="qrWrap" hidden>
+        <img id="qrImg" alt="QR code to open Lantern" />
+        <div class="sec-note" style="margin-top:8px">Scan with a phone camera to open Lantern.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Information comes from Google and may not be complete. Call ahead when you can. <br>
+    A free community tool from Healing Souls. Free to share with anyone who needs it.
+  </footer>
+</div>
+
+<script>
+/* =========================================================================
+   LANTERN
+   Google API key (below) is used only for the category search (Places API New),
+   which works with a key restricted to your github.io domain. ZIP and address
+   lookup use a keyless service, because Google will not geocode with a
+   referrer-restricted key. Crisis lines work with no key at all.
+   ========================================================================= */
+const API_KEY = "AIzaSyAuYOEy5msNRmIh6zP2EaT08sBEnNQRC8c";
+
+const RADIUS_MILES = 20;
+const RADIUS_METERS = Math.round(RADIUS_MILES * 1609.344);
+
+const CATEGORIES = [
+  { id:"food",    label:"Food banks",        ic:"🥫", query:"food bank food pantry" },
+  { id:"shelter", label:"Shelters",          ic:"🛏️", query:"homeless shelter emergency shelter" },
+  { id:"donate",  label:"Donation drop-off", ic:"📦", query:"donation drop off center charity donations",
+      note:"Places that take clothing, household goods, furniture, and food, such as Goodwill, Salvation Army, and Habitat ReStore. Call ahead for what they accept and their drop-off hours." },
+  { id:"vets",    label:"Veterans",          ic:"🎖️", query:"veterans affairs VA clinic vet center veterans services",
+      note:"VA clinics, Vet Centers, and veteran service organizations near you. The official locator lists every VA facility and what each one offers.",
+      directory:{ url:"https://www.va.gov/find-locations/", text:"Official VA facility locator" } },
+  { id:"animal",  label:"Animal shelters",   ic:"🐾", query:"animal shelter humane society" },
+  { id:"aa",      label:"AA meetings",       ic:"🟦", query:"Alcoholics Anonymous meeting",
+      note:"Many AA meetings are held in churches and halls that are not listed as their own place. For a full local schedule, use the official finder.",
+      directory:{ url:"https://www.aa.org/find-aa", text:"Official AA meeting finder" } },
+  { id:"na",      label:"NA meetings",       ic:"🟫", query:"Narcotics Anonymous meeting",
+      note:"NA meeting locations change often and may not all appear on the map. The official search is the most reliable.",
+      directory:{ url:"https://www.na.org/meetingsearch/", text:"Official NA meeting search" } },
+  { id:"lgbtq",   label:"LGBTQ+ safe spaces", ic:"🏳️‍🌈", query:"LGBTQ community center pride center",
+      note:"Welcoming spaces include community centers, PFLAG chapters, and affirming groups. The directory below lists more than the map can.",
+      directory:{ url:"https://www.lgbtqcenters.org/LGBTCenters", text:"CenterLink LGBTQ+ center directory" } },
+];
+
+let center = null;
+let activeCat = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function haversineMiles(a, b){
+  const R=3958.8, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+  return R*2*Math.asin(Math.sqrt(s));
+}
+
+/* chips */
+const chipsEl = $("chips");
+CATEGORIES.forEach(cat=>{
+  const b=document.createElement("button");
+  b.className="chip"; b.type="button"; b.disabled=true;
+  b.setAttribute("aria-pressed","false"); b.dataset.id=cat.id;
+  b.innerHTML=`<span class="ic">${cat.ic}</span>${esc(cat.label)}`;
+  b.addEventListener("click",()=>runCategory(cat.id));
+  chipsEl.appendChild(b);
+});
+function enableChips(on){ chipsEl.querySelectorAll(".chip").forEach(c=>c.disabled=!on); }
+function markActive(id){ chipsEl.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed", c.dataset.id===id ? "true":"false")); }
+
+/* crisis dropdown */
+const crisisBtn=$("crisisToggle"), crisisDrop=$("crisisBody");
+function setCrisis(open){
+  crisisDrop.hidden=!open;
+  crisisBtn.setAttribute("aria-expanded", String(open));
+  crisisBtn.querySelector(".cb-hint").textContent = open ? "Tap to close" : "Tap to open";
+}
+crisisBtn.addEventListener("click", e=>{ e.stopPropagation(); setCrisis(crisisDrop.hidden); });
+document.addEventListener("click", e=>{ if(!crisisDrop.hidden && !crisisDrop.contains(e.target) && !crisisBtn.contains(e.target)) setCrisis(false); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !crisisDrop.hidden) setCrisis(false); });
+
+/* location */
+function setCenter(lat,lng,label){
+  center={lat,lng,label};
+  const s=$("locStatus"); s.className="loc-status set";
+  s.innerHTML=`<span class="pin">📍</span> ${esc(label)} · searching within ${RADIUS_MILES} miles`;
+  enableChips(true);
+  if(activeCat) runCategory(activeCat);
+  else $("results").innerHTML=`<div class="state"><strong>Location set.</strong>Now pick a category above.</div>`;
+}
+$("useLoc").addEventListener("click",()=>{
+  if(!navigator.geolocation){ locError("Your browser cannot share location. Type a ZIP code instead."); return; }
+  $("locStatus").innerHTML=`<span class="pin">📍</span> Getting your location...`;
+  navigator.geolocation.getCurrentPosition(
+    p=>setCenter(p.coords.latitude,p.coords.longitude,"Your current location"),
+    ()=>locError("Could not get your location. Make sure the page is online and that you allowed location access, or type a ZIP code."),
+    {enableHighAccuracy:true, timeout:10000, maximumAge:60000}
+  );
+});
+$("setZip").addEventListener("click", setLocationFromText);
+$("zip").addEventListener("keydown", e=>{ if(e.key==="Enter") setLocationFromText(); });
+function locError(msg){ const s=$("locStatus"); s.className="loc-status"; s.innerHTML=`<span class="pin">·</span> ${esc(msg)}`; }
+
+async function setLocationFromText(){
+  const q=$("zip").value.trim();
+  if(!q){ $("zip").focus(); return; }
+  $("locStatus").innerHTML=`<span class="pin">·</span> Finding ${esc(q)}...`;
+  const hit=await geocodeText(q);
+  if(hit.lat!=null){ setCenter(hit.lat, hit.lng, hit.label); return; }
+  if(hit.error==="file"){ $("hostNote").style.display="block"; locError("This page is running as a file on your device, so it cannot look anything up. Open the online https:// link instead."); return; }
+  if(hit.error==="nokey"){ $("keyNote").style.display="block"; locError("Add your Google API key to this file first."); return; }
+  if(hit.error==="google"){ locError("Lookup was blocked. Set the key's website restriction to healingsoulsenergy.github.io/* and open the page online, not as a file."); return; }
+  if(hit.error==="network"){ locError("Could not reach the lookup service. Check your connection and try again."); return; }
+  locError("Could not find that ZIP or address. Try just the 5-digit ZIP, or use the location button.");
+}
+
+/* Location lookup runs through the same Places API (New) call as the category
+   search, so it works with your domain-restricted key. A bare ZIP falls back to
+   Zippopotam only if Google returns no match. Returns an object whose shape tells
+   setLocationFromText exactly what to say on failure. */
+async function geocodeText(q){
+  if(location.protocol==="file:") return {error:"file"};
+  if(!keyReady()) return {error:"nokey"};
+  try{
+    const res=await fetch("https://places.googleapis.com/v1/places:searchText",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-Goog-Api-Key":API_KEY,
+        "X-Goog-FieldMask":"places.location,places.formattedAddress,places.displayName"
+      },
+      body:JSON.stringify({ textQuery:q, maxResultCount:1, languageCode:"en", regionCode:"US" })
+    });
+    const data=await res.json();
+    if(data.error) return {error:"google", message:data.error.message||""};
+    const p=data.places&&data.places[0];
+    if(p&&p.location){
+      const lab=(p.formattedAddress || (p.displayName&&p.displayName.text) || q).split(",").map(s=>s.trim()).filter(Boolean).slice(0,3).join(", ");
+      return {lat:p.location.latitude, lng:p.location.longitude, label:lab};
+    }
+  }catch(e){ return {error:"network"}; }
+  const zip=q.match(/^(\d{5})$/);
+  if(zip){
+    try{
+      const r=await fetch("https://api.zippopotam.us/us/"+zip[1]);
+      if(r.ok){ const d=await r.json(); const pl=d.places&&d.places[0];
+        if(pl) return {lat:+pl.latitude, lng:+pl.longitude, label:pl["place name"]+", "+pl["state abbreviation"]+" "+zip[1]}; }
+    }catch(e){}
+  }
+  return {notfound:true};
+}
+
+function keyReady(){ return API_KEY && API_KEY.indexOf("PASTE_")!==0; }
+
+async function runCategory(catId){
+  const cat=CATEGORIES.find(c=>c.id===catId);
+  if(!cat) return;
+  activeCat=catId; markActive(catId);
+  if(!center){ $("results").innerHTML=`<div class="state"><strong>Set a location first.</strong>Use the buttons above so we know where to look.</div>`; return; }
+  if(!keyReady()){ $("keyNote").style.display="block"; $("results").innerHTML=`<div class="state"><strong>Almost ready.</strong>Add your Google API key to this file to turn on nearby search.</div>`; return; }
+
+  $("results").innerHTML=`<div class="state"><div class="spinner"></div>Looking for ${esc(cat.label.toLowerCase())} within ${RADIUS_MILES} miles...</div>`;
+  try{
+    const res=await fetch("https://places.googleapis.com/v1/places:searchText",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-Goog-Api-Key":API_KEY,
+        "X-Goog-FieldMask":"places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.location,places.regularOpeningHours,places.googleMapsUri,places.businessStatus,places.primaryTypeDisplayName"
+      },
+      body:JSON.stringify({
+        textQuery:cat.query, maxResultCount:20, languageCode:"en", regionCode:"US",
+        locationBias:{ circle:{ center:{latitude:center.lat, longitude:center.lng}, radius:RADIUS_METERS } }
+      })
+    });
+    const data=await res.json();
+    if(data.error){ renderError(cat, data.error.message||"Search was blocked."); return; }
+    renderResults(cat, data.places||[]);
+  }catch(e){ renderError(cat, "Could not reach the search service. Check your connection and try again."); }
+}
+
+function renderError(cat, msg){
+  let hint="";
+  if(/referer|referrer|not authorized|permission|API key|denied/i.test(msg)){
+    hint=`<div class="dir-note">This usually means the key's website restriction does not yet include this page. In Google Cloud, set the key restriction to <code>healingsoulsenergy.github.io/*</code> and open the page online, not as a file.</div>`;
+  }
+  $("results").innerHTML=`<div class="state"><strong>Search didn't go through.</strong>${esc(msg)}</div>`+hint+directoryNote(cat);
+}
+
+function directoryNote(cat){
+  if(!cat.note && !cat.directory) return "";
+  const link=cat.directory?`<a href="${esc(cat.directory.url)}" target="_blank" rel="noopener">${esc(cat.directory.text)} →</a>`:"";
+  const note=cat.note?esc(cat.note):"";
+  return `<div class="dir-note">${note}${note&&link?" ":""}${link}</div>`;
+}
+
+function renderResults(cat, places){
+  const within=[];
+  places.forEach(p=>{
+    if(p.businessStatus==="CLOSED_PERMANENTLY") return;
+    if(!p.location) return;
+    const mi=haversineMiles(center, {lat:p.location.latitude, lng:p.location.longitude});
+    if(mi<=RADIUS_MILES+0.25){ p._mi=mi; within.push(p); }
+  });
+  within.sort((a,b)=>a._mi-b._mi);
+  let html=directoryNote(cat);
+  if(!within.length){
+    html+=`<div class="state"><strong>Nothing found within ${RADIUS_MILES} miles.</strong>${cat.directory?"The directory link above may list more.":"Try a nearby ZIP code, or call 211 for local help."}</div>`;
+    $("results").innerHTML=html; return;
+  }
+  html+=within.map(p=>placeCard(p)).join("");
+  $("results").innerHTML=html;
+}
+
+function placeCard(p){
+  const name=esc(p.displayName?.text||"Unnamed");
+  const addr=esc(p.formattedAddress||"");
+  const phone=p.nationalPhoneNumber||"";
+  const telHref="tel:"+phone.replace(/[^\d+]/g,"");
+  const mi=p._mi.toFixed(1);
+  const oh=p.regularOpeningHours;
+  let openPill="";
+  if(oh && typeof oh.openNow==="boolean"){ openPill = oh.openNow ? `<span class="open yes">Open now</span>` : `<span class="open no">Closed now</span>`; }
+  const lat=p.location.latitude, lng=p.location.longitude;
+  const dir="https://www.google.com/maps/dir/?api=1&destination="+lat+","+lng+(p.id?"&destination_place_id="+encodeURIComponent(p.id):"");
+  let hours="";
+  if(oh && Array.isArray(oh.weekdayDescriptions) && oh.weekdayDescriptions.length){
+    hours=`<details class="hours"><summary>View hours</summary><ul>${oh.weekdayDescriptions.map(d=>`<li>${esc(d)}</li>`).join("")}</ul></details>`;
+  }
+  const metaBits=[];
+  if(p.primaryTypeDisplayName?.text) metaBits.push(esc(p.primaryTypeDisplayName.text));
+  if(openPill) metaBits.push(openPill);
+  return `<div class="place">
+    <div class="top"><p class="nm">${name}</p><span class="dist">${mi} mi</span></div>
+    ${metaBits.length?`<div class="meta">${metaBits.join('<span style="opacity:.4">·</span>')}</div>`:""}
+    ${addr?`<div class="addr">${addr}</div>`:""}
+    <div class="actions">
+      <a class="a-dir" href="${dir}" target="_blank" rel="noopener">🧭 Directions</a>
+      ${phone?`<a class="a-call" href="${telHref}">📞 ${esc(phone)}</a>`:""}
+      ${p.websiteUri?`<a class="a-web" href="${esc(p.websiteUri)}" target="_blank" rel="noopener">🌐 Website</a>`:""}
+    </div>
+    ${hours}
+  </div>`;
+}
+
+/* sharing */
+function shareURL(){ return location.protocol==="file:" ? "" : (location.origin+location.pathname); }
+const SHARE_TEXT="Lantern, free help near you for food, shelter, recovery meetings, and crisis support: ";
+function shareMsg(t){ const s=$("shareMsg"); s.className="loc-status set"; s.textContent=t; }
+function shareWarn(t){ const s=$("shareMsg"); s.className="loc-status"; s.textContent=t; }
+
+$("shareBtn").addEventListener("click", async ()=>{
+  const url=shareURL();
+  if(!url){ shareWarn("Put the page online first, then the share link will point to it."); return; }
+  if(navigator.share){ try{ await navigator.share({title:"Lantern", text:"Free help near you.", url}); }catch(e){} return; }
+  try{ await navigator.clipboard.writeText(url); shareMsg("Link copied. Paste it into a text or email."); }
+  catch(e){ shareWarn(url); }
+});
+$("smsBtn").addEventListener("click", ()=>{
+  const url=shareURL();
+  if(!url){ shareWarn("Put the page online first, then the link will work."); return; }
+  window.location.href="sms:?&body="+encodeURIComponent(SHARE_TEXT+url);
+});
+$("qrBtn").addEventListener("click", ()=>{
+  const wrap=$("qrWrap"), btn=$("qrBtn"), url=shareURL();
+  if(!url){ shareWarn("Put the page online first, then a scannable code can point to it."); return; }
+  const open=wrap.hidden;
+  if(open) $("qrImg").src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data="+encodeURIComponent(url);
+  wrap.hidden=!open;
+  btn.setAttribute("aria-expanded", String(open));
+  btn.textContent= open ? "📱 Hide QR code" : "📱 Show QR code";
+});
+
+/* init */
+if(location.protocol==="file:") $("hostNote").style.display="block";
+if(!keyReady()) $("keyNote").style.display="block";
+</script>
+</body>
+</html>
