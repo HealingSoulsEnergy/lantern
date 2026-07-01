@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#13352f" />
+<link rel="canonical" href="https://lanternhelp.org/" />
 <link rel="manifest" href="./manifest.webmanifest" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -37,6 +38,8 @@
   header p{margin:7px 0 0; color:#bcd4cc; font-size:14.5px; max-width:54ch}
   .danger-line{margin-top:13px; display:inline-flex; align-items:center; gap:8px; background:rgba(180,83,42,.18); border:1px solid rgba(255,255,255,.18); color:#ffe6da; font-size:13.5px; font-weight:600; padding:7px 12px; border-radius:999px}
   .danger-line a{color:#fff; text-decoration:underline}
+  .privacy-line{margin:12px 0 0; color:#9fbcb4; font-size:12.5px; line-height:1.5; max-width:58ch}
+  .privacy-line strong{color:#cfe3db; font-weight:600}
 
   .crisis-bar-wrap{position:sticky; top:0; z-index:60; background:var(--mist)}
   .crisis-bar-wrap .wrap{position:relative; padding-top:10px; padding-bottom:10px}
@@ -148,6 +151,7 @@
     <div class="brand"><svg class="mark" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true"><path d="M9.5 3.2h5" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><path d="M12 3.2v2.4" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><rect x="7.2" y="5.6" width="9.6" height="2.8" rx="1.1" stroke="#f4c79a" stroke-width="1.6"/><rect x="8.2" y="8.4" width="7.6" height="9.4" rx="2.6" stroke="#f4c79a" stroke-width="1.6"/><path d="M8.6 20.4h6.8" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="13.4" r="2.1" fill="#f4c79a" opacity=".9"/></svg><h1>Lantern</h1></div>
     <p>Real help, close to you. Find food, shelter, recovery meetings, animal care, and welcoming spaces nearby.</p>
     <span class="danger-line">If you are in immediate danger, call <a href="tel:911">911</a>.</span>
+    <p class="privacy-line"><strong>Private and free.</strong> No sign-up, no account, and nothing you do here is saved. For extra privacy, open this in a private or incognito tab.</p>
   </div>
 </header>
 
@@ -264,6 +268,9 @@ const CATEGORIES = [
   { id:"clinic",  label:"Free clinics",      ic:"🩺", query:"free clinic community health center sliding scale clinic",
       note:"Community health centers and free clinics that set fees by income and care for people without insurance. The federal finder below lists sliding-scale health centers near you.",
       directory:{ url:"https://findahealthcenter.hrsa.gov/", text:"Official sliding-scale health center finder" } },
+  { id:"mental",  label:"Counseling",        ic:"💬", query:"mental health counseling therapist community mental health center",
+      note:"Counselors, therapists, and community mental health centers, including sliding-scale options. For immediate crisis support, the 988 line at the top answers day or night. The official locator below covers mental health and substance use care near you.",
+      directory:{ url:"https://findtreatment.gov/", text:"Official mental health treatment finder" } },
   { id:"jobs",    label:"Job help",          ic:"💼", query:"American Job Center workforce employment services career center",
       note:"Free help with job searching, resumes, training, and applications. American Job Centers are free and open to everyone. The official locator below is the most complete.",
       directory:{ url:"https://www.careeronestop.org/LocalHelp/AmericanJobCenters/find-american-job-centers.aspx", text:"Official American Job Center finder" } },
@@ -495,7 +502,8 @@ function placeCard(p){
 }
 
 /* sharing */
-function shareURL(){ return location.protocol==="file:" ? "" : (location.origin+location.pathname); }
+const SITE_URL="https://lanternhelp.org/";
+function shareURL(){ return SITE_URL; }
 const SHARE_TEXT="Lantern, free help near you for food, shelter, recovery meetings, and crisis support: ";
 function shareMsg(t){ const s=$("shareMsg"); s.className="loc-status set"; s.textContent=t; }
 function shareWarn(t){ const s=$("shareMsg"); s.className="loc-status"; s.textContent=t; }
