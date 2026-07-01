@@ -121,6 +121,9 @@
   .a-call:hover{background:#f1faf8}
   .a-web{background:#fff; color:var(--soft) !important}
   .a-web:hover{border-color:var(--soft)}
+  .actions .a-save{background:#fff; color:var(--ink); border:1px solid var(--line); font:inherit; font-weight:600; font-size:13.5px; padding:9px 13px; border-radius:10px; display:inline-flex; align-items:center; gap:7px; cursor:pointer}
+  .actions .a-save:hover{border-color:var(--teal); color:var(--teal)}
+  .actions .a-save:active{transform:translateY(1px)}
   .hours{margin-top:9px}
   .hours summary{font-size:13px; color:var(--teal); cursor:pointer; font-weight:600; list-style:none}
   .hours summary::-webkit-details-marker{display:none}
@@ -466,11 +469,49 @@ function renderResults(cat, places){
     html+=`<div class="state"><strong>Nothing found within ${RADIUS_MILES} miles.</strong>${cat.directory?"The directory link above may list more.":"Try a nearby ZIP code, or call 211 for local help."}</div>`;
     $("results").innerHTML=html; return;
   }
-  html+=within.map(p=>placeCard(p)).join("");
+  lastResults=within;
+  html+=within.map((p,i)=>placeCard(p,i)).join("");
   $("results").innerHTML=html;
 }
+let lastResults=[];
 
-function placeCard(p){
+/* Save a place into the phone's contacts via a vCard. */
+function vEsc(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n"); }
+function buildVCard(p){
+  const name=(p.displayName&&p.displayName.text)||"Place";
+  const tel=(p.nationalPhoneNumber||"").replace(/[^\d+]/g,"");
+  const addr=p.formattedAddress||"";
+  const url=p.websiteUri||"";
+  const lines=["BEGIN:VCARD","VERSION:3.0","FN:"+vEsc(name),"ORG:"+vEsc(name)];
+  if(tel) lines.push("TEL;TYPE=WORK,VOICE:"+tel);
+  if(addr) lines.push("ADR;TYPE=WORK:;;"+vEsc(addr)+";;;;");
+  if(url) lines.push("URL:"+url);
+  lines.push("NOTE:Saved from Lantern (lanternhelp.org)");
+  lines.push("END:VCARD");
+  return lines.join("\r\n");
+}
+function saveContact(p){
+  const data=buildVCard(p);
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if(isIOS){ window.location.href="data:text/vcard;charset=utf-8,"+encodeURIComponent(data); return; }
+  const fname=(((p.displayName&&p.displayName.text)||"contact").replace(/[^\w \-]/g,"").trim().slice(0,40)||"contact")+".vcf";
+  try{
+    const blob=new Blob([data],{type:"text/vcard;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=fname; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1500);
+  }catch(e){
+    window.location.href="data:text/vcard;charset=utf-8,"+encodeURIComponent(data);
+  }
+}
+$("results").addEventListener("click", e=>{
+  const b=e.target.closest(".a-save"); if(!b) return;
+  const p=lastResults[+b.dataset.idx];
+  if(p) saveContact(p);
+});
+
+function placeCard(p, idx){
   const name=esc(p.displayName?.text||"Unnamed");
   const addr=esc(p.formattedAddress||"");
   const phone=p.nationalPhoneNumber||"";
@@ -495,6 +536,7 @@ function placeCard(p){
     <div class="actions">
       <a class="a-dir" href="${dir}" target="_blank" rel="noopener">🧭 Directions</a>
       ${phone?`<a class="a-call" href="${telHref}">📞 ${esc(phone)}</a>`:""}
+      <button class="a-save" type="button" data-idx="${idx}">💾 Save to contacts</button>
       ${p.websiteUri?`<a class="a-web" href="${esc(p.websiteUri)}" target="_blank" rel="noopener">🌐 Website</a>`:""}
     </div>
     ${hours}
