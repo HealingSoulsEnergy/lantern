@@ -338,8 +338,14 @@ $("useLoc").addEventListener("click",()=>{
   $("locStatus").innerHTML=`<span class="pin">📍</span> Getting your location...`;
   navigator.geolocation.getCurrentPosition(
     p=>setCenter(p.coords.latitude,p.coords.longitude,"Your current location"),
-    ()=>locError("Could not get your location. Make sure the page is online and that you allowed location access, or type a ZIP code."),
-    {enableHighAccuracy:true, timeout:10000, maximumAge:60000}
+    err=>{
+      let m="Could not get your location. Type a ZIP code instead.";
+      if(err && err.code===1) m="Location is blocked for this site. Tap the lock or tune icon next to the web address, turn Location on, then tap Use my location again. Or just type a ZIP code.";
+      else if(err && err.code===2) m="Your location isn't available right now. Check that your phone's location setting is on, or type a ZIP code.";
+      else if(err && err.code===3) m="Locating took too long. Try once more, or type a ZIP code.";
+      locError(m);
+    },
+    {enableHighAccuracy:false, timeout:15000, maximumAge:300000}
   );
 });
 $("setZip").addEventListener("click", setLocationFromText);
