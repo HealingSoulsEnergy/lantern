@@ -3,7 +3,7 @@
    signal. Category search still needs a connection, but the lifelines do not.
    Bump CACHE if you change the icons or manifest; HTML updates pick up
    automatically because navigations are served network-first. */
-const CACHE = "lantern-v2";
+const CACHE = "wdit-v1";
 const CORE = [
   "./",
   "./index.html",

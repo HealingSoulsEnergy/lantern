@@ -1,6 +1,6 @@
 {
-  "name": "The Lantern — Find Help Near You",
-  "short_name": "The Lantern",
+  "name": "Where Do I Turn? — Find Help Near You",
+  "short_name": "Where Do I Turn?",
   "description": "Free help near you: food, shelter, clinics, recovery meetings, and crisis support.",
   "start_url": "./",
   "scope": "./",

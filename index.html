@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="The Lantern" />
-<title>The Lantern — Find Help Near You</title>
+<meta name="apple-mobile-web-app-title" content="Where Do I Turn?" />
+<title>Where Do I Turn? — Find Help Near You</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -151,7 +151,7 @@
 <body>
 <header>
   <div class="wrap">
-    <div class="brand"><svg class="mark" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true"><path d="M9.5 3.2h5" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><path d="M12 3.2v2.4" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><rect x="7.2" y="5.6" width="9.6" height="2.8" rx="1.1" stroke="#f4c79a" stroke-width="1.6"/><rect x="8.2" y="8.4" width="7.6" height="9.4" rx="2.6" stroke="#f4c79a" stroke-width="1.6"/><path d="M8.6 20.4h6.8" stroke="#f4c79a" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="13.4" r="2.1" fill="#f4c79a" opacity=".9"/></svg><h1>The Lantern</h1></div>
+    <div class="brand"><svg class="mark" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true"><circle cx="17.5" cy="6.5" r="3" fill="#f3ba5f"/><path d="M4.5 21 Q7.5 14 12 12 T17.5 9" stroke="#f4c79a" stroke-width="2.2" stroke-linecap="round"/><circle cx="8.7" cy="16.3" r="1.7" fill="#f4c79a"/></svg><h1>Where Do I Turn?</h1></div>
     <p>Real help, close to you. Find food, shelter, recovery meetings, animal care, and welcoming spaces nearby.</p>
     <span class="danger-line">If you are in immediate danger, call <a href="tel:911">911</a>.</span>
     <p class="privacy-line"><strong>Private and free.</strong> No sign-up, no account, and nothing you do here is saved. For extra privacy, open this in a private or incognito tab.</p>
@@ -186,7 +186,7 @@
 <div class="wrap wrap-main">
 
   <div id="installBar" class="install-bar" hidden>
-    <span class="it" id="installText">Add The Lantern to your phone for one-tap access.</span>
+    <span class="it" id="installText">Add this app to your phone for one-tap access.</span>
     <span class="install-actions">
       <button id="installBtn" class="btn btn-primary" type="button" style="padding:8px 14px">Add</button>
       <button id="installDismiss" class="install-x" type="button" aria-label="Dismiss">✕</button>
@@ -231,7 +231,7 @@
 
   <section class="block card">
     <div class="pad">
-      <h2 class="sec">Share The Lantern</h2>
+      <h2 class="sec">Share this tool</h2>
       <p class="sec-note">Send it to someone who needs it, or print the code for a flyer or front desk.</p>
       <div class="loc-row">
         <button class="btn btn-primary" id="shareBtn" type="button">🔗 Share link</button>
@@ -240,8 +240,8 @@
       </div>
       <div class="loc-status" id="shareMsg"></div>
       <div class="qr-box" id="qrWrap" hidden>
-        <img id="qrImg" alt="QR code to open The Lantern" />
-        <div class="sec-note" style="margin-top:8px">Scan with a phone camera to open The Lantern.</div>
+        <img id="qrImg" alt="QR code to open Where Do I Turn?" />
+        <div class="sec-note" style="margin-top:8px">Scan with a phone camera to open Where Do I Turn?</div>
       </div>
     </div>
   </section>
@@ -486,7 +486,7 @@ function buildVCard(p){
   if(tel) lines.push("TEL;TYPE=WORK,VOICE:"+tel);
   if(addr) lines.push("ADR;TYPE=WORK:;;"+vEsc(addr)+";;;;");
   if(url) lines.push("URL:"+url);
-  lines.push("NOTE:Saved from The Lantern (lanternhelp.org)");
+  lines.push("NOTE:Saved from Where Do I Turn? (lanternhelp.org)");
   lines.push("END:VCARD");
   return lines.join("\r\n");
 }
@@ -546,14 +546,14 @@ function placeCard(p, idx){
 /* sharing */
 const SITE_URL="https://lanternhelp.org/";
 function shareURL(){ return SITE_URL; }
-const SHARE_TEXT="The Lantern, free help near you for food, shelter, recovery meetings, and crisis support: ";
+const SHARE_TEXT="Where Do I Turn? Free help near you for food, shelter, recovery meetings, and crisis support: ";
 function shareMsg(t){ const s=$("shareMsg"); s.className="loc-status set"; s.textContent=t; }
 function shareWarn(t){ const s=$("shareMsg"); s.className="loc-status"; s.textContent=t; }
 
 $("shareBtn").addEventListener("click", async ()=>{
   const url=shareURL();
   if(!url){ shareWarn("Put the page online first, then the share link will point to it."); return; }
-  if(navigator.share){ try{ await navigator.share({title:"The Lantern", text:"Free help near you.", url}); }catch(e){} return; }
+  if(navigator.share){ try{ await navigator.share({title:"Where Do I Turn?", text:"Free help near you.", url}); }catch(e){} return; }
   try{ await navigator.clipboard.writeText(url); shareMsg("Link copied. Paste it into a text or email."); }
   catch(e){ shareWarn(url); }
 });
@@ -583,7 +583,7 @@ if(!keyReady()) $("keyNote").style.display="block";
   const standalone=()=> (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone===true;
   const isIOS=()=> /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   function show(){ if(!standalone() && !dismissed && location.protocol!=="file:") bar.hidden=false; }
-  window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferred=e; txt.textContent="Add The Lantern to your phone for one-tap access."; btn.style.display=""; show(); });
+  window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferred=e; txt.textContent="Add this app to your phone for one-tap access."; btn.style.display=""; show(); });
   btn.addEventListener("click", async ()=>{ if(!deferred) return; deferred.prompt(); await deferred.userChoice; deferred=null; bar.hidden=true; });
   x.addEventListener("click", ()=>{ bar.hidden=true; dismissed=true; });
   if(isIOS() && !standalone()){ txt.textContent="To install: tap the Share icon, then Add to Home Screen."; btn.style.display="none"; show(); }
